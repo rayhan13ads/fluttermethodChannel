@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     methodChannelValue = 'not initiated';
   }
 
-  initMethodChannel() async{
+  initMethodChannel() async {
     // pass in data into android kotlin code;
     Posts posts = await apiCall();
 
@@ -32,17 +32,29 @@ class _HomePageState extends State<HomePage> {
     String data = json.encode(posts);
     print("---------------string data ${data}");
 
-    var sendmap = <String, dynamic>{
-      'from':data,
-      'phone':'01639130474'
-    };
-     String returedValue = await methodChannel.invokeMethod<String>('getUserName',sendmap);
-     if(returedValue != null){
-       setState(() {
-         methodChannelValue = returedValue;
-       });
-     }
+    var sendmap = <String, dynamic>{'from': data, 'phone': '01639130474'};
+    String returedValue =
+        await methodChannel.invokeMethod<String>('getUserName', sendmap);
+    if (returedValue != null) {
+      setState(() {
+        methodChannelValue = returedValue;
+      });
+    }
   }
+
+
+sslCommerzMethodChannel() async {
+   
+    String returedValue =
+        await methodChannel.invokeMethod<String>('callSSL');
+    if (returedValue != null) {
+      setState(() {
+        methodChannelValue = returedValue;
+      });
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +66,25 @@ class _HomePageState extends State<HomePage> {
         child: Center(
           child: Column(
             children: [
-              Text("${methodChannelValue}",style: Theme.of(context).textTheme.headline4,),
+              Text(
+                "${methodChannelValue}",
+                style: Theme.of(context).textTheme.headline4,
+              ),
               RaisedButton(
-                onPressed: (){
+                onPressed: () {
                   initMethodChannel();
                 },
                 color: Colors.greenAccent,
                 child: Text("Initate Method"),
-              )
+              ),
+              SizedBox(height: 30,),
+              RaisedButton(
+                onPressed: () {
+                  sslCommerzMethodChannel();
+                },
+                color: Colors.greenAccent,
+                child: Text("payment by ssl commerz"),
+              ),
             ],
           ),
         ),
@@ -69,11 +92,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<Posts> apiCall() async{
+  Future<Posts> apiCall() async {
     Dio dio = Dio();
     var res = await dio.get("https://jsonplaceholder.typicode.com/posts/1");
     return Posts.fromJson(res.data);
-
   }
-
 }
